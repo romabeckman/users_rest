@@ -41,13 +41,15 @@ class Route extends Singleton {
             $url = array_filter($url);
             $url = implode('\/', $url);
 
-            if (preg_match('/\/?' . $url . '\/?/', implode('/', $uri))) {
+            if (preg_match('/^(\/)?' . $url . '(\/)?$/iu', implode('/', $uri))) {
                 if ($route['method'] == $method) {
                     list($this->controller, $this->method) = explode('/', $route['controller']);
                     return;
                 }
             }
         }
+
+        Factory::header()->setCode(400);
     }
 
     function getController() {

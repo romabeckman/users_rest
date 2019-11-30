@@ -34,4 +34,12 @@ class Header extends Singleton {
         $object->answer();
     }
 
+    function getCode(): int {
+        return $this->code;
+    }
+
+    function getContentType(): string {
+        return $this->ContentType;
+    }
+
 }

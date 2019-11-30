@@ -19,18 +19,18 @@ use Core\Providers\Factory;
 class Bootstrap extends Singleton {
 
     public function load() {
-        $route = Factory::route();
+        Factory::route()->load();
+        $answer = null;
 
-        $header = Factory::header();
-        $answer = $this->callController();
+        if (Factory::header()->getCode() < 300) {
+            $answer = $this->callController();
+        }
 
-        $route->load();
-        $header->answer();
+        Factory::header()->answer();
 
-        if (is_array($answer))
-            echo json_encode($answer);
-        else
-            echo $answer;
+        echo is_array($answer) ?
+                json_encode($answer) :
+                $answer;
     }
 
     private function callController() {
@@ -41,7 +41,7 @@ class Bootstrap extends Singleton {
             return null;
         }
 
-        echo $controller = '\App\Controllers\\' . $route->getController();
+        $controller = '\App\Controllers\\' . $route->getController();
         $object = new $controller();
         return $object->{$route->getMethod()}();
     }
