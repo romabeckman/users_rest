@@ -12,26 +12,31 @@
  * @author Romário Beckman
  */
 
-namespace Providers;
+namespace Core\Providers;
 
-use \App\Models\UserModel;
-use \App\Daos\UserDao;
-use \Drivers\JsonDriver;
+use Core\Drivers\JsonDriver;
+use Core\Services\Http;
+use Core\Services\Route;
+use Core\Services\Header;
 
 class Factory {
-
-    static function userModel(): UserModel {
-        return new UserModel();
-    }
-
-    static function userDao(): UserDao {
-        return UserDao::getInstance();
-    }
 
     static function jsonDriver(): JsonDriver {
         $config['directory'] = BASEPATH . 'Databases' . DIRECTORY_SEPARATOR . 'Json' . DIRECTORY_SEPARATOR;
         $JsonDriver = new JsonDriver();
         return $JsonDriver->connection($config);
+    }
+
+    static function http(): Http {
+        return Http::getInstance();
+    }
+
+    static function route(): Route {
+        return Route::getInstance();
+    }
+
+    static function header(): Header {
+        return Header::getInstance();
     }
 
 }

@@ -12,12 +12,12 @@
  * @author Romário Beckman
  */
 
-namespace Drivers;
+namespace Core\Drivers;
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-use Interfaces\DriverDB;
-use Exceptions\InvalidConnectionDatabaseParamsException;
+use Core\Interfaces\DriverDB;
+use Core\Exceptions\InvalidConnectionDatabaseParamsException;
 
 class JsonDriver implements DriverDB {
 

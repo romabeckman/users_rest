@@ -11,7 +11,7 @@
  * @author Romário Beckman
  */
 
-namespace Interfaces;
+namespace Core\Interfaces;
 
 interface DriverDB {
 

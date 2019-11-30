@@ -6,14 +6,13 @@
  * and open the template in the editor.
  */
 
+namespace Core\Interfaces;
+
 /**
- * Description of InvalidConnectionDatabaseParams
  *
  * @author Romário Beckman
  */
+interface AnswerHttp {
 
-namespace Exceptions;
-
-class InvalidConnectionDatabaseParamsException extends \Exception {
-
+    public function answer();
 }

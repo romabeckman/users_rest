@@ -1,6 +1,6 @@
 <?php
 
-namespace Providers;
+namespace Core\Providers;
 
 class Singleton {
 

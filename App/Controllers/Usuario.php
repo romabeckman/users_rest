@@ -7,18 +7,28 @@
  */
 
 /**
- * Description of UserDao
+ * Description of Usuario
  *
  * @author Romário Beckman
  */
 
-namespace App\Daos;
+namespace App\Controllers;
 
-use Providers\Singleton;
+class Usuario {
 
-class UserDao extends Singleton {
+    function index() {
 
-    function fetchAll() {
+    }
+
+    function cadastrar() {
+
+    }
+
+    function listar() {
+
+    }
+
+    function deletar() {
 
     }
 
