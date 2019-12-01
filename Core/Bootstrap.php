@@ -22,7 +22,9 @@ class Bootstrap extends Singleton {
         Factory::route()->load();
         $answer = null;
 
-        if (Factory::header()->getCode() < 300) {
+        $answer = $this->runProxy();
+
+        if (Factory::header()->getCode() < 300 and empty($answer)) {
             $answer = $this->callController();
         }
 
@@ -44,6 +46,17 @@ class Bootstrap extends Singleton {
         $controller = '\App\Controllers\\' . $route->getController();
         $object = new $controller();
         return $object->{$route->getMethod()}();
+    }
+
+    private function runProxy() {
+        $route = Factory::route();
+
+        if (empty($route->getProxy()))
+            return;
+
+        $proxy = $route->getProxy();
+        $object = new $proxy();
+        return $object->run();
     }
 
 }

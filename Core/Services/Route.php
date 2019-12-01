@@ -24,6 +24,8 @@ class Route extends Singleton {
     private $controller;
     private $method;
     private $config;
+    private $proxy;
+    private $params;
 
     public function load() {
         require BASEPATH . 'Config' . DIRECTORY_SEPARATOR . 'Route.php';
@@ -41,9 +43,11 @@ class Route extends Singleton {
             $url = array_filter($url);
             $url = implode('\/', $url);
 
-            if (preg_match('/^(\/)?' . $url . '(\/)?$/iu', implode('/', $uri))) {
-                if ($route['method'] == $method) {
+            if (preg_match('/^\/?' . $url . '\/?$/iu', implode('/', $uri), $match)) {
+                if (($route['method'] ?? 'GET') == $method) {
+                    $this->params = explode('/', $match[0]);
                     list($this->controller, $this->method) = explode('/', $route['controller']);
+                    $this->proxy = $route['proxy'] ?? null;
                     return;
                 }
             }
@@ -58,6 +62,14 @@ class Route extends Singleton {
 
     function getMethod() {
         return $this->method;
+    }
+
+    function getProxy(): ?string {
+        return $this->proxy;
+    }
+
+    function getParams() {
+        return $this->params;
     }
 
 }

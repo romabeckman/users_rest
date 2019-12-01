@@ -24,10 +24,12 @@ class Http extends Singleton {
     }
 
     public function getUri(): array {
-        return array_filter(
-                explode(
-                        '/',
-                        strstr($_SERVER['REQUEST_URI'], '?', true) ?: $_SERVER['REQUEST_URI']
+        return array_merge(
+                array_filter(
+                        explode(
+                                '/',
+                                strstr($_SERVER['REQUEST_URI'], '?', true) ?: $_SERVER['REQUEST_URI']
+                        )
                 )
         );
     }

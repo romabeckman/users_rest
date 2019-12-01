@@ -90,4 +90,15 @@ class UserModel {
         ]);
     }
 
+    public function toArray(): array {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->getName(),
+            'email' => $this->getEmail(),
+            'password' => $this->getPassword(),
+            'drink' => $this->getDrink(),
+            'token' => $this->getToken()
+        ];
+    }
+
 }

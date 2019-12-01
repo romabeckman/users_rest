@@ -76,6 +76,18 @@ class JsonDriver implements DriverDB {
         $this->writeTable($table, $json);
     }
 
+    public function delete(string $table, array $where = []): void {
+        $json = $this->getContentsTable($table);
+        $response = [];
+        foreach ($json as $data) {
+            $data = (array) $data;
+            $match = $this->match($data, $where);
+            if (!$match)
+                $response[] = $data;
+        }
+        $this->writeTable($table, $response);
+    }
+
     private function getContentsTable(string $table): array {
         $file = $this->dirFIle . $table . '.json';
         if (!file_exists($file))

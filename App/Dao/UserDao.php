@@ -37,7 +37,7 @@ class UserDao extends Singleton {
                 $user['name'] ?? null,
                 $user['email'] ?? null,
                 $user['password'] ?? null,
-                (int) ($user['drink '] ?? 0),
+                (int) ($user['drink'] ?? 0),
                 $user['token'] ?? null
         );
     }
@@ -54,7 +54,7 @@ class UserDao extends Singleton {
                     $user['name'] ?? null,
                     $user['email'] ?? null,
                     $user['password'] ?? null,
-                    (int) ($user['drink '] ?? 0),
+                    (int) ($user['drink'] ?? 0),
                     $user['token'] ?? null
             );
         }, $users);
@@ -80,17 +80,31 @@ class UserDao extends Singleton {
         return $UserModel;
     }
 
-    public function update(UserModel $UserModel): bool {
-        Factory::jsonDriver()->update($this->table, [
-            'id' => $UserModel->getId(),
-            'name' => $UserModel->getName(),
-            'email' => $UserModel->getEmail(),
-            'password' => $UserModel->getPassword(),
-            'drink' => $UserModel->getDrink(),
-            'token' => $UserModel->getToken()
-                ], ['id' => $UserModel->getId()]);
+    public function update(UserModel $UserModel, $encryptPassword = false): void {
+        if ($encryptPassword) {
+            $password = $this->encryptPassword($UserModel->getPassword());
+            $UserModel->setPassword($password);
+        }
 
-        return true;
+        Factory::jsonDriver()->update(
+                $this->table,
+                $UserModel->toArray(),
+                ['id' => $UserModel->getId()]
+        );
+    }
+
+    public function updateDrink(UserModel $UserModel, int $drink): void {
+        $drinkMl = $UserModel->getDrink() + $drink;
+        $UserModel->setDrink($drinkMl);
+
+        Factory::jsonDriver()->update(
+                $this->table,
+                $UserModel->toArray(),
+                ['id' => $UserModel->getId()]);
+    }
+
+    public function delete(int $id): void {
+        Factory::jsonDriver()->delete($this->table, ['id' => $id]);
     }
 
     public function buscaPorEmailSenha(string $email, string $password): ?UserModel {

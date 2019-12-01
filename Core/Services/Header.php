@@ -46,4 +46,15 @@ class Header extends Singleton {
         return $this->ContentType;
     }
 
+    public function __get($name): ?string {
+        $name = strtoupper($name);
+
+        if (isset($_SERVER[$name]))
+            return $_SERVER[$name];
+        elseif (isset($_SERVER['HTTP_' . $name]))
+            return $_SERVER['HTTP_' . $name];
+
+        return null;
+    }
+
 }
