@@ -58,6 +58,10 @@ class Http extends Singleton {
         return $this->getPhpInput();
     }
 
+    public function json(): array {
+        return (array) json_decode(file_get_contents('php://input'), true);
+    }
+
     private function getPhpInput() {
         parse_str(file_get_contents("php://input"), $post_vars);
         return $post_vars;

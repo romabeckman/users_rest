@@ -14,6 +14,9 @@
 
 namespace App\Controllers;
 
+use App\Dao\UserDao;
+use Core\Providers\Factory;
+
 class Usuario {
 
     function index() {
@@ -21,7 +24,33 @@ class Usuario {
     }
 
     function cadastrar() {
+        $json = Factory::http()->json();
 
+        if (empty($json['name']))
+            return ['Error' => 'Campo nome é obrigatório'];
+        if (empty($json['email']))
+            return ['Error' => 'Campo email é obrigatório'];
+        if (!filter_var($json['email'], FILTER_VALIDATE_EMAIL))
+            return ['Error' => 'Informe um e-mail válido'];
+        if (empty($json['password']))
+            return ['Error' => 'Campo senha é obrigatório'];
+
+        $UserModel = UserDao::getInstance()->fetch(['email' => $json['email']]);
+
+        if (!empty($UserModel))
+            return ['Error' => 'E-mail ' . $json['email'] . ' já está cadastrado, informe outro e-mail.'];
+
+
+        $UserModel = UserDao::getInstance()->inserir(
+                $json['name'],
+                $json['email'],
+                $json['password']
+        );
+
+        Factory::header()->setCode(201);
+        Factory::header()->setHeader('Location: /users/' . $UserModel->getId());
+        Factory::header()->setHeader('Content-Location: /users/' . $UserModel->getId());
+        return [];
     }
 
     function listar() {

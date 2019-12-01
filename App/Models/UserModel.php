@@ -20,6 +20,17 @@ class UserModel {
     private $name;
     private $email;
     private $password;
+    private $drink;
+    private $token;
+
+    function __construct(?int $id, string $name, string $email, ?string $password = null, int $drink = 0, string $token = '') {
+        $this->id = $id;
+        $this->name = $name;
+        $this->email = $email;
+        $this->password = $password;
+        $this->drink = $drink;
+        $this->token = $token;
+    }
 
     function getId(): int {
         return $this->id;
@@ -53,12 +64,29 @@ class UserModel {
         $this->password = $password;
     }
 
+    function getDrink(): int {
+        return $this->drink;
+    }
+
+    function setDrink(int $drink): void {
+        $this->drink = $drink;
+    }
+
+    function getToken() {
+        return $this->token;
+    }
+
+    function generateToken(): void {
+        $this->token = hash('ripemd256', time() . $this->getEmail() . $this->getId());
+    }
+
     public function __toString(): string {
         return json_encode([
             'id' => $this->getId(),
             'name' => $this->getName(),
             'email' => $this->getEmail(),
             'password' => $this->getPassword(),
+            'drink' => $this->getDrink()
         ]);
     }
 

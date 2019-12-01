@@ -14,12 +14,99 @@
 
 namespace App\Dao;
 
-use Providers\Singleton;
+use Core\Providers\Singleton;
+use App\Models\UserModel;
+use Core\Providers\Factory;
 
 class UserDao extends Singleton {
 
-    function fetchAll() {
+    private $table = 'Users';
 
+    private function encryptPassword(string $password): string {
+        return hash('sha512', $password);
+    }
+
+    public function fetch(array $filtro = []): ?UserModel {
+        $user = Factory::jsonDriver()->fetch($this->table, $filtro);
+
+        if (empty($user))
+            return null;
+
+        return new UserModel(
+                $user['id'] ?? null,
+                $user['name'] ?? null,
+                $user['email'] ?? null,
+                $user['password'] ?? null,
+                (int) ($user['drink '] ?? 0),
+                $user['token'] ?? null
+        );
+    }
+
+    public function fetchAll(array $filtro = []): ?array {
+        $users = Factory::jsonDriver()->fetchAll($this->table, $filtro);
+
+        if (empty($users))
+            return null;
+
+        return array_map(function ($user) {
+            return new UserModel(
+                    $user['id'] ?? null,
+                    $user['name'] ?? null,
+                    $user['email'] ?? null,
+                    $user['password'] ?? null,
+                    (int) ($user['drink '] ?? 0),
+                    $user['token'] ?? null
+            );
+        }, $users);
+    }
+
+    public function inserir(string $name, string $email, string $password): UserModel {
+        $UserModel = new UserModel(
+                time(),
+                $name,
+                $email,
+                $this->encryptPassword($password)
+        );
+
+        Factory::jsonDriver()->insert($this->table, [
+            'id' => $UserModel->getId(),
+            'name' => $UserModel->getName(),
+            'email' => $UserModel->getEmail(),
+            'password' => $UserModel->getPassword(),
+            'drink' => 0,
+            'token' => ''
+        ]);
+
+        return $UserModel;
+    }
+
+    public function update(UserModel $UserModel): bool {
+        Factory::jsonDriver()->update($this->table, [
+            'id' => $UserModel->getId(),
+            'name' => $UserModel->getName(),
+            'email' => $UserModel->getEmail(),
+            'password' => $UserModel->getPassword(),
+            'drink' => $UserModel->getDrink(),
+            'token' => $UserModel->getToken()
+                ], ['id' => $UserModel->getId()]);
+
+        return true;
+    }
+
+    public function buscaPorEmailSenha(string $email, string $password): ?UserModel {
+        $user = Factory::jsonDriver()->fetch($this->table, [
+            'email' => $email,
+            'password' => $this->encryptPassword($password),
+        ]);
+
+        return empty($user) ?
+                null :
+                new UserModel(
+                        $user['id'] ?? null,
+                        $user['name'] ?? null,
+                        $user['email'] ?? null,
+                        $user['password'] ?? null
+        );
     }
 
 }

@@ -28,6 +28,10 @@ class Header extends Singleton {
         $this->ContentType = $ContentType;
     }
 
+    function setHeader(string $header, bool $replace = true) {
+        header($header, $replace);
+    }
+
     public function answer() {
         $class = 'Core\Services\Header\Answer' . $this->code;
         $object = new $class();

@@ -43,6 +43,8 @@ class JsonDriver implements DriverDB {
             if ($match)
                 return $data;
         }
+
+        return [];
     }
 
     public function fetchAll(string $table, array $where = []): array {
@@ -66,7 +68,7 @@ class JsonDriver implements DriverDB {
     public function update(string $table, array $data, array $where = []): void {
         $json = $this->getContentsTable($table);
         foreach ($json as $i => $d) {
-            $match = $this->match($d, $where);
+            $match = $this->match((array) $d, $where);
             if ($match)
                 $json[$i] = $data;
         }
