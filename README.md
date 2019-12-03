@@ -1,5 +1,3 @@
-# Teste Mosly
-
 Requisitos: 
 - PHP a partir da versão 7.1
 
