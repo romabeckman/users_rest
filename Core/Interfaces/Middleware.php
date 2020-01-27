@@ -8,11 +8,13 @@
 
 namespace Core\Interfaces;
 
+use Closure;
+
 /**
  *
  * @author Romário Beckman
  */
-interface Proxy {
+interface Middleware {
 
-    public function run();
+    public function handle($request, Closure $next);
 }

@@ -9,9 +9,9 @@
 namespace Core;
 
 use Closure;
+use Core\Interfaces\Middleware;
 use Core\Providers\Singleton;
 use Core\Providers\Factory;
-use Core\Services\Middleware;
 use Core\Services\Route;
 use stdClass;
 

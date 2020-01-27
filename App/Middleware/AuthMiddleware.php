@@ -4,10 +4,10 @@ namespace App\Middleware;
 
 use App\Dao\UserDao;
 use Closure;
+use Core\Interfaces\Middleware;
 use Core\Providers\Factory;
-use Core\Services\Middleware;
 
-class AuthMiddleware extends Middleware
+class AuthMiddleware implements Middleware
 {
     public function handle($request, Closure $next)
     {

@@ -3,9 +3,9 @@
 namespace App\Middleware;
 
 use Closure;
-use Core\Services\Middleware;
+use Core\Interfaces\Middleware as InterfacesMiddleware;
 
-class TesteMiddleware extends Middleware
+class TesteMiddleware implements InterfacesMiddleware
 {
     public function handle($request, Closure $next)
     {
