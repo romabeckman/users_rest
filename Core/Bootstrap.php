@@ -8,34 +8,52 @@
 
 namespace Core;
 
+use Closure;
 use Core\Providers\Singleton;
 use Core\Providers\Factory;
+use Core\Services\Middleware;
+use Core\Services\Route;
+use stdClass;
 
 /**
  * Description of Bootstrap
  *
  * @author Romário Beckman
  */
-class Bootstrap extends Singleton {
+class Bootstrap extends Singleton
+{
 
-    public function load() {
-        Factory::route()->load();
-        $answer = null;
+    public function load()
+    {
+        $answer = [];
+        $route = Factory::route();
+        $route->load();
 
-        $answer = $this->runProxy();
-
-        if (Factory::header()->getCode() < 300 and empty($answer)) {
-            $answer = $this->callController();
+        switch ($route->getStatus()) {
+            case Route::FOUND:
+                $middleware = $this->runMiddleware($route->getMiddleware());
+                break;
+            case Route::NOT_FOUND:
+                break;
+            default:
+                # code...
+                break;
         }
+
+        if (isset($middleware->Error))
+            $answer['Error'] = [$middleware->Error];
+        else
+            $answer = $this->callController();
 
         Factory::header()->answer();
 
         echo is_array($answer) ?
-                json_encode($answer) :
-                $answer;
+            json_encode($answer) :
+            $answer;
     }
 
-    private function callController() {
+    private function callController()
+    {
         $route = Factory::route();
 
         if (empty($route->getController())) {
@@ -48,15 +66,22 @@ class Bootstrap extends Singleton {
         return $object->{$route->getMethod()}();
     }
 
-    private function runProxy() {
-        $route = Factory::route();
+    private function runMiddleware(array $middlewares)
+    {
+        $object = new stdClass;
 
-        if (empty($route->getProxy()))
-            return;
+        if (empty($middlewares)) {
+            return $object;
+        } else {
+            $return = array_reduce($middlewares, function (Closure $next, Middleware $middleware) {
+                return function ($object) use ($next, $middleware) {
+                    return $middleware->handle($object, $next);
+                };
+            }, function ($object) {
+                return $object;
+            });
 
-        $proxy = $route->getProxy();
-        $object = new $proxy();
-        return $object->run();
+            return $return($object);
+        }
     }
-
 }

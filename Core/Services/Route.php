@@ -16,60 +16,78 @@ namespace Core\Services;
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+use Closure;
 use Core\Providers\Factory;
 use Core\Providers\Singleton;
 
-class Route extends Singleton {
+class Route extends Singleton
+{
 
+    const FOUND = 1;
+    const NOT_FOUND = 0;
+
+    private $status = self::NOT_FOUND;
     private $controller;
     private $method;
-    private $config;
-    private $proxy;
     private $params;
+    private $middlewares = [];
 
-    public function load() {
-        require BASEPATH . 'Config' . DIRECTORY_SEPARATOR . 'Route.php';
-        $this->config = $config ?? [];
-        $this->setParams();
+    public function load()
+    {
+        $config = require BASEPATH . 'Config' . DIRECTORY_SEPARATOR . 'Route.php';
+        $this->setParams($config);
     }
 
-    private function setParams(): void {
+    private function setParams($routes = [])
+    {
         $http = Factory::http();
         $uri = $http->getUri();
         $method = $http->getMethod();
 
-        foreach ($this->config as $route) {
-            $url = explode('/', $route['url']);
-            $url = array_filter($url);
-            $url = implode('\/', $url);
+        foreach ($routes as $middleware => $route) {
+            if ($this->status == self::FOUND)
+                return;
 
-            if (preg_match('/^\/?' . $url . '\/?$/iu', implode('/', $uri), $match)) {
-                if (($route['method'] ?? 'GET') == $method) {
-                    $this->params = explode('/', $match[0]);
-                    list($this->controller, $this->method) = explode('/', $route['controller']);
-                    $this->proxy = $route['proxy'] ?? null;
-                    return;
+            if ($route instanceof Closure) {
+                $this->setParams($route());
+
+                if ($this->status == self::FOUND)
+                    $this->middlewares[] = new $middleware();
+            } else {
+                $urlRegx = implode("\/", $http->getUri($route['url']));
+                if (preg_match('/^\/?' . $urlRegx . '\/?$/iu', implode('/', $uri), $match)) {
+                    if (($route['method'] ?? 'GET') == $method) {
+                        $this->params = explode('/', $match[0]);
+                        list($this->controller, $this->method) = explode('/', $route['controller']);
+                        $this->status = self::FOUND;
+                    }
                 }
             }
         }
-
-        Factory::header()->setCode(400);
     }
 
-    function getController() {
+    function getController()
+    {
         return $this->controller;
     }
 
-    function getMethod() {
+    function getMethod()
+    {
         return $this->method;
     }
 
-    function getProxy(): ?string {
-        return $this->proxy;
-    }
-
-    function getParams() {
+    function getParams()
+    {
         return $this->params;
     }
 
+    function getMiddleware(): array
+    {
+        return $this->middlewares;
+    }
+
+    function getStatus()
+    {
+        return $this->status;
+    }
 }
