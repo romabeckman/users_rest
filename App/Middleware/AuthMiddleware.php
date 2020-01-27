@@ -21,7 +21,7 @@ class AuthMiddleware extends Middleware
         
         $userDao = UserDao::getInstance();
         $UserModel = $userDao->fetch(['token' => $token]);
-        
+
         if (empty($UserModel)) {
             Factory::header()->setCode(401);
             $request->Error = 'Token de acesso inválido';
